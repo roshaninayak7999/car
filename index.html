@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Racing Game</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #222;
+  font-family: Arial;
+  text-align: center;
+  color: white;
+}
+h1 { padding: 15px; color: #00ff88; }
+#game {
+  width: 320px;
+  height: 520px;
+  background: #555;
+  margin: auto;
+  position: relative;
+  overflow: hidden;
+  border: 5px solid white;
+}
+.road-line {
+  position: absolute;
+  left: 155px;
+  width: 8px;
+  height: 60px;
+  background: white;
+  animation: move 0.7s linear infinite;
+}
+@keyframes move {
+  from { transform: translateY(-70px); }
+  to { transform: translateY(530px); }
+}
+#car {
+  position: absolute;
+  bottom: 20px;
+  left: 135px;
+  font-size: 45px;
+}
+#enemy {
+  position: absolute;
+  top: -70px;
+  left: 50px;
+  font-size: 45px;
+}
+button {
+  padding: 15px 30px;
+  margin: 10px;
+  font-size: 20px;
+  border: none;
+  border-radius: 10px;
+  background: #00ff88;
+}
+</style>
+</head>
+<body>
+
+<h1>🏎️ CAR RACING</h1>
+<h2>Score: <span id="score">0</span></h2>
+
+<div id="game">
+  <div class="road-line" style="top:100px"></div>
+  <div class="road-line" style="top:300px"></div>
+  <div id="car">🏎️</div>
+  <div id="enemy">🚙</div>
+</div>
+
+<div>
+  <button onclick="move(-1)">⬅️</button>
+  <button onclick="move(1)">➡️</button>
+</div>
+
+<script>
+const car = document.getElementById("car");
+const enemy = document.getElementById("enemy");
+const scoreText = document.getElementById("score");
+
+let carX = 135;
+let enemyY = -70;
+let enemyX = 50;
+let score = 0;
+let gameOver = false;
+
+function move(dir) {
+  if (gameOver) return;
+  carX += dir * 40;
+  carX = Math.max(5, Math.min(270, carX));
+  car.style.left = carX + "px";
+}
+
+function gameLoop() {
+  if (gameOver) return;
+
+  enemyY += 5;
+  enemy.style.top = enemyY + "px";
+
+  if (enemyY > 520) {
+    enemyY = -70;
+    enemyX = Math.floor(Math.random() * 260);
+    enemy.style.left = enemyX + "px";
+    score++;
+    scoreText.textContent = score;
+  }
+
+  if (enemyY > 430 && enemyY < 500 &&
+      Math.abs(carX - enemyX) < 40) {
+    gameOver = true;
+    alert("Game Over! Score: " + score);
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
