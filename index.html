@@ -1,122 +1,116 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
+<title>Ultimate Car Racing</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Car Racing Game</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: #222;
-  font-family: Arial;
-  text-align: center;
-  color: white;
+*{box-sizing:border-box}
+body{
+ margin:0;background:#111;color:white;
+ font-family:Arial;text-align:center;
 }
-h1 { padding: 15px; color: #00ff88; }
-#game {
-  width: 320px;
-  height: 520px;
-  background: #555;
-  margin: auto;
-  position: relative;
-  overflow: hidden;
-  border: 5px solid white;
+h1{color:#00ff99}
+#score{font-size:24px;color:yellow}
+#game{
+ width:320px;height:520px;
+ margin:auto;background:#444;
+ border-left:8px solid white;
+ border-right:8px solid white;
+ position:relative;overflow:hidden;
 }
-.road-line {
-  position: absolute;
-  left: 155px;
-  width: 8px;
-  height: 60px;
-  background: white;
-  animation: move 0.7s linear infinite;
+.line{
+ position:absolute;width:8px;height:70px;
+ background:white;left:148px;
 }
-@keyframes move {
-  from { transform: translateY(-70px); }
-  to { transform: translateY(530px); }
+#player,#enemy{
+ position:absolute;font-size:43px;
 }
-#car {
-  position: absolute;
-  bottom: 20px;
-  left: 135px;
-  font-size: 45px;
-}
-#enemy {
-  position: absolute;
-  top: -70px;
-  left: 50px;
-  font-size: 45px;
-}
-button {
-  padding: 15px 30px;
-  margin: 10px;
-  font-size: 20px;
-  border: none;
-  border-radius: 10px;
-  background: #00ff88;
+#player{bottom:15px;left:130px}
+#enemy{top:-70px;left:50px}
+.controls button,.start{
+ padding:14px 25px;margin:8px;
+ font-size:23px;border:0;
+ border-radius:12px;background:#00ff99;
 }
 </style>
 </head>
 <body>
 
-<h1>🏎️ CAR RACING</h1>
-<h2>Score: <span id="score">0</span></h2>
+<h1>🏎️ ULTIMATE RACING</h1>
+<div id="score">Score: 0</div>
 
 <div id="game">
-  <div class="road-line" style="top:100px"></div>
-  <div class="road-line" style="top:300px"></div>
-  <div id="car">🏎️</div>
-  <div id="enemy">🚙</div>
+ <div class="line" style="top:0"></div>
+ <div class="line" style="top:180px"></div>
+ <div class="line" style="top:360px"></div>
+ <div id="player">🏎️</div>
+ <div id="enemy">🚙</div>
 </div>
 
-<div>
-  <button onclick="move(-1)">⬅️</button>
-  <button onclick="move(1)">➡️</button>
+<div class="controls">
+ <button onclick="move(-1)">⬅️</button>
+ <button onclick="move(1)">➡️</button>
 </div>
+
+<button class="start" onclick="startGame()">START GAME</button>
+<p id="message">Press START to play!</p>
 
 <script>
-const car = document.getElementById("car");
-const enemy = document.getElementById("enemy");
-const scoreText = document.getElementById("score");
+const player=document.getElementById("player");
+const enemy=document.getElementById("enemy");
+const scoreBox=document.getElementById("score");
+const message=document.getElementById("message");
 
-let carX = 135;
-let enemyY = -70;
-let enemyX = 50;
-let score = 0;
-let gameOver = false;
+let x=130,y=-70,score=0,speed=5;
+let playing=false,frame;
 
-function move(dir) {
-  if (gameOver) return;
-  carX += dir * 40;
-  carX = Math.max(5, Math.min(270, carX));
-  car.style.left = carX + "px";
+function move(d){
+ if(!playing)return;
+ x=Math.max(5,Math.min(260,x+d*35));
+ player.style.left=x+"px";
 }
 
-function gameLoop() {
-  if (gameOver) return;
-
-  enemyY += 5;
-  enemy.style.top = enemyY + "px";
-
-  if (enemyY > 520) {
-    enemyY = -70;
-    enemyX = Math.floor(Math.random() * 260);
-    enemy.style.left = enemyX + "px";
-    score++;
-    scoreText.textContent = score;
-  }
-
-  if (enemyY > 430 && enemyY < 500 &&
-      Math.abs(carX - enemyX) < 40) {
-    gameOver = true;
-    alert("Game Over! Score: " + score);
-  }
-
-  requestAnimationFrame(gameLoop);
+function startGame(){
+ cancelAnimationFrame(frame);
+ x=130;y=-70;score=0;speed=5;
+ playing=true;
+ player.style.left=x+"px";
+ enemy.style.top=y+"px";
+ enemy.style.left="50px";
+ scoreBox.innerText="Score: 0";
+ message.innerText="Race started! Good luck!";
+ loop();
 }
 
-gameLoop();
+function loop(){
+ if(!playing)return;
+
+ y+=speed;
+ enemy.style.top=y+"px";
+
+ if(y>530){
+  y=-70;
+  enemy.style.left=Math.floor(Math.random()*250)+"px";
+  score++;
+  speed=Math.min(12,5+score*0.2);
+  scoreBox.innerText="Score: "+score;
+ }
+
+ let ex=parseInt(enemy.style.left)||0;
+
+ if(y>400 && y<500 && Math.abs(x-ex)<38){
+  playing=false;
+  message.innerText="💥 GAME OVER! Score: "+score;
+  return;
+ }
+ frame=requestAnimationFrame(loop);
+}
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowLeft")move(-1);
+ if(e.key==="ArrowRight")move(1);
+});
 </script>
-
 </body>
 </html>
